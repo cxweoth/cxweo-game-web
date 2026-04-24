@@ -15,7 +15,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '翻開所有非地雷的格子；數字提示周圍地雷數。',
     emoji: '💣',
     tags: ['邏輯', '經典'],
-    implemented: false,
+    implemented: true,
   },
   {
     slug: 'gomoku',
