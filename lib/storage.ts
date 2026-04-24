@@ -49,6 +49,24 @@ export function setHighScore(slug: string, score: number): boolean {
   return true;
 }
 
+// --- 最佳時間（越低越好）---
+//
+// 用於「完成越快越好」類型的遊戲（踩地雷等）。key 建議用 `game:variant`
+// 例如 `minesweeper:easy`，讓同一款遊戲的不同難度各自獨立記錄。
+
+export function getBestTime(key: string): number | null {
+  const value = readKey<number>(`best-time:${key}`);
+  return typeof value === 'number' ? value : null;
+}
+
+/** 只在新時間更短時寫入，回傳是否有更新 */
+export function setBestTime(key: string, seconds: number): boolean {
+  const current = getBestTime(key);
+  if (current !== null && current <= seconds) return false;
+  writeKey(`best-time:${key}`, seconds);
+  return true;
+}
+
 // --- 全域設定 ---
 
 export type AppTheme = 'light' | 'dark' | 'system';

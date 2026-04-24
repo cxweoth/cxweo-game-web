@@ -96,6 +96,9 @@ README.md                      本地開發 + Vercel 說明
 - `clamp(v, min, max)` / `range(n)` / `randomInt(lo, hi)`：基本純函式。
 - `getHighScore(slug)` / `setHighScore(slug, score)`（`lib/storage.ts`）：最高分存取；
   `setHighScore` 只在新分數更高時寫入，回傳是否更新。
+- `getBestTime(key)` / `setBestTime(key, seconds)`（`lib/storage.ts`）：**越低越好**的紀錄
+  （計時制遊戲用）；`setBestTime` 只在新時間更短時寫入。key 建議 `game:variant`（如
+  `minesweeper:easy`）。
 - `getSettings()` / `setSettings(partial)`：讀寫全域設定（目前只有 `theme`）。
 - `GAMES`（`lib/games-registry.ts`）：遊戲列表；`getGameBySlug(slug)`。
 
@@ -136,7 +139,7 @@ README.md                      本地開發 + Vercel 說明
 
 | 名稱 | slug | 完成日期 | 渲染方式 | 備註 |
 |---|---|---|---|---|
-| — | — | — | — | Phase 1 完成時此表為空 |
+| 踩地雷 | `minesweeper` | 2026-04-24 | DOM grid（`<button>`） | 三難度（9×9/16×16/16×30）、首擊 + 8 鄰保護、BFS flood fill、結算以橫幅顯示（非 Modal）、最佳時間用 `getBestTime/setBestTime` 存每難度。timer 用 `setInterval(250ms)` 更新 UI，不是動畫主迴圈。 |
 
 ## 6. 程式碼慣例
 
