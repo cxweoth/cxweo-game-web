@@ -34,6 +34,19 @@ function writeKey<T>(key: string, value: T): void {
   }
 }
 
+// --- 通用 JSON 存取 ---
+//
+// 當遊戲需要保存結構化資料（戰績、偏好設定等），用這組 API。
+// key 會自動加上專案 prefix，避免與其他網站的 localStorage 衝突。
+
+export function readJSON<T>(key: string): T | null {
+  return readKey<T>(key);
+}
+
+export function writeJSON<T>(key: string, value: T): void {
+  writeKey(key, value);
+}
+
 // --- 最高分 ---
 
 export function getHighScore(slug: string): number | null {

@@ -99,6 +99,8 @@ README.md                      本地開發 + Vercel 說明
 - `getBestTime(key)` / `setBestTime(key, seconds)`（`lib/storage.ts`）：**越低越好**的紀錄
   （計時制遊戲用）；`setBestTime` 只在新時間更短時寫入。key 建議 `game:variant`（如
   `minesweeper:easy`）。
+- `readJSON<T>(key)` / `writeJSON<T>(key, value)`（`lib/storage.ts`）：通用 JSON 結構存取，
+  用於戰績、偏好等任意結構化資料；自動加上專案 prefix，避免污染。
 - `getSettings()` / `setSettings(partial)`：讀寫全域設定（目前只有 `theme`）。
 - `GAMES`（`lib/games-registry.ts`）：遊戲列表；`getGameBySlug(slug)`。
 
@@ -140,6 +142,7 @@ README.md                      本地開發 + Vercel 說明
 | 名稱 | slug | 完成日期 | 渲染方式 | 備註 |
 |---|---|---|---|---|
 | 踩地雷 | `minesweeper` | 2026-04-24 | DOM grid（`<button>`） | 三難度（9×9/16×16/16×30）、首擊 + 8 鄰保護、BFS flood fill、結算以橫幅顯示（非 Modal）、最佳時間用 `getBestTime/setBestTime` 存每難度。timer 用 `setInterval(250ms)` 更新 UI，不是動畫主迴圈。 |
+| 五子棋 | `gomoku` | 2026-04-25 | SVG（無 Canvas） | 15×15、無禁手、PvP + 簡易 AI（單層啟發式打分，防守權重 1.1）、AI 模式悔棋一次 2 步、結算以橫幅顯示。戰績與偏好（模式 / 執色）用 `readJSON/writeJSON` 存（key：`gomoku:stats` / `gomoku:prefs`）。tabIndex 放在 wrapper `<div>` 而非 SVG 上：避免 Chromium 在 SVG 上畫 focus ring，並用 `select-none caret-transparent` + 全域 `.no-focus-ring` 抑制 caret 與 outline。 |
 
 ## 6. 程式碼慣例
 
@@ -178,6 +181,16 @@ README.md                      本地開發 + Vercel 說明
    - 更新 CLAUDE.md 的「已完成遊戲」表格。
    - 視需要更新「共用元件與工具」章節（若新增共用元件）。
 4. 使用者確認合併後才做 merge / push。
+
+### 注意事項：focusable SVG 的「白色 caret」陷阱
+
+當 wrapper `<div>` 帶 `tabIndex={0}` 並包含 SVG `<text>` 子元素時，Chromium 會在
+clicked 位置放一個 **blinking text caret**（一閃一閃的白色細線）。即使 `outline: none`
+也擋不住，因為它不是 outline 而是 caret。
+
+**對策**：包板的 div 一律加 `select-none caret-transparent`（或 inline
+`caretColor: 'transparent'`）。本專案已在 `globals.css` 提供 `.no-focus-ring` 全域樣式
+連同 outline / box-shadow 一併蓋掉。
 
 ## 9. 禁止事項
 
