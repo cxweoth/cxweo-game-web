@@ -143,6 +143,7 @@ README.md                      本地開發 + Vercel 說明
 |---|---|---|---|---|
 | 踩地雷 | `minesweeper` | 2026-04-24 | DOM grid（`<button>`） | 三難度（9×9/16×16/16×30）、首擊 + 8 鄰保護、BFS flood fill、結算以橫幅顯示（非 Modal）、最佳時間用 `getBestTime/setBestTime` 存每難度。timer 用 `setInterval(250ms)` 更新 UI，不是動畫主迴圈。 |
 | 五子棋 | `gomoku` | 2026-04-25 | SVG（無 Canvas） | 15×15、無禁手、PvP + 簡易 AI（單層啟發式打分，防守權重 1.1）、AI 模式悔棋一次 2 步、結算以橫幅顯示。戰績與偏好（模式 / 執色）用 `readJSON/writeJSON` 存（key：`gomoku:stats` / `gomoku:prefs`）。tabIndex 放在 wrapper `<div>` 而非 SVG 上：避免 Chromium 在 SVG 上畫 focus ring，並用 `select-none caret-transparent` + 全域 `.no-focus-ring` 抑制 caret 與 outline。 |
+| 射箭 | `archery` | 2026-04-25 | Canvas + rAF | **首款 Canvas 遊戲**，800×480 內部解析度（CSS aspect-ratio 縮放）。物理：重力 + 水平風力，蓄力決定初速、滑鼠/鍵盤調仰角、放開射出。每箭隨機風（30–180 px/s²，顯示在 HUD），蓄力時繪預瞄虛線（含風預測）。10 環 FITA 配色標靶；落地判定用 segment-crossing 找箭與標靶平面交點再內插。物理 / 渲染狀態都在 ref，每幀 imperative 繪圖，**不**透過 React state 觸發 re-render；只在「箭落下」事件 dispatch 給 hook。最佳分用 `setHighScore('archery', total)` 存。**屬於 PROJECT.md 規格外的第 7 款**。 |
 
 ## 6. 程式碼慣例
 
