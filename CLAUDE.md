@@ -148,6 +148,7 @@ README.md                      本地開發 + Vercel 說明
 | 弓手獵怪 | `monster-hunt` | 2026-04-25 | Canvas + rAF | **規格外第 8 款**。雙方對射：玩家 HP 10、怪物 HP 5；怪物會 AI 飄移並週期射火球。為了維持 60fps，所有每幀變動的東西在單一 `worldRef` 物件裡（見 `physics.ts`），React state 只管 HP 與結束狀態。死亡瞬間有完整演出：能量爆裂環、26 顆飛散粒子（含重力與摩擦）、螢幕震動 380ms、屍體灰化旋轉下沉、「擊敗！/ K.O.」浮字。檔案拆成 `types`/`fx`/`physics`/`render-bg`/`render-actors`/`render-hud`/`render`/`useMonsterHunt`/`MonsterHunt`/`MonsterHuntCanvas` 以維持單檔 ≤ 300 行。 |
 | 接球 | `catch-ball` | 2026-04-25 | Canvas + rAF | PROJECT.md 規格內 Phase 5。底部籃子接從上掉的彩球，金球（8% 機率）+5、普通 +1；3 顆紅心，漏球 −1。難度依「累計接球數」漸增：球速最高 ×3、生成間隔從 1500ms → 500ms（30 球達峰）。架構同 monster-hunt（單一 `worldRef` + `physics.ts` + 純函式 `render.ts`），但因規模小未拆 render，整檔仍在 300 行內。最佳分用 `setHighScore('catch-ball', total)`。 |
 | 俄羅斯方塊 | `tetris` | 2026-04-26 | Canvas（離散，用 setTimeout 不用 rAF） | PROJECT.md 規格內 Phase 6。10×20、7 種方塊、7-bag 隨機、鬼影預覽、消行記分、按等級加速、軟降/硬降、暫停。沒實作 SRS 踢牆（撞到就拒絕旋轉）。動畫以 React state + useEffect+setTimeout 驅動，因為 Tetris 的世界是格狀離散的，rAF 反而過頭。除了鍵盤外提供 5 顆觸控按鍵（←/↻/→/↓ 軟降/DROP）給手機。最佳分 `setHighScore('tetris')`。 |
+| 下樓梯 | `stairs` | 2026-04-26 | Canvas + rAF（直式 480×720） | PROJECT.md 規格內 Phase 7。樓梯持續上捲、角色重力下墜、踩到 normal +1、fragile +2（會碎）、spike −1 ❤、頭頂尖刺天花板直接 game over。連續落地用「上一幀腳底是否在 stair 上方」防穿透。`onStairId` 紀錄角色站著的階梯，下一幀讓角色跟著一起捲動，避免被抛在後面。隨深度漸增捲動速度（110 → 240 px/s）。最佳分 `setHighScore('stairs')`。 |
 
 ## 6. 程式碼慣例
 

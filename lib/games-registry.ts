@@ -63,7 +63,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '踩著台階往下，避開天花板與刺。',
     emoji: '🪜',
     tags: ['敏捷'],
-    implemented: false,
+    implemented: true,
   },
   {
     slug: 'bubble-shooter',
