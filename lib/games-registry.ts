@@ -26,6 +26,14 @@ export const GAMES: readonly GameMeta[] = [
     implemented: true,
   },
   {
+    slug: 'archery',
+    name: '射箭',
+    description: '蓄力瞄準射 10 環標靶，5 箭一輪。風向影響軌跡。',
+    emoji: '🏹',
+    tags: ['敏捷', '物理'],
+    implemented: true,
+  },
+  {
     slug: 'catch-ball',
     name: '接球',
     description: '左右移動接住從天而降的球，漏太多就結束。',
