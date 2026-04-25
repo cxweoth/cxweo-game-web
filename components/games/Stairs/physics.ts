@@ -46,14 +46,19 @@ export function createWorld(): World {
     nextStairId: 1,
   };
   // 出生時先擺好幾階。第一階直接放在角色腳下，角色開局就站好。
-  w.stairs.push({
+  // 注意:必須同時把 onStairId 設成這階,否則第一幀的樓梯捲動會讓角色腳底
+  // 略低於階梯頂面,「上一幀腳底在階梯上方」的條件就不成立,角色會直接穿
+  // 過第一階摔到第二階上 — 玩家會看到「自己往下跳」的詭異現象。
+  const firstStair: Stair = {
     id: w.nextStairId++,
     x: CFG.charXInit - CFG.stairW / 2,
     y: CFG.charYInit + CFG.charH,
     w: CFG.stairW,
     type: 'normal',
     broken: false,
-  });
+  };
+  w.stairs.push(firstStair);
+  w.onStairId = firstStair.id;
   let y = CFG.charYInit + CFG.charH + CFG.stairSpacingMin;
   while (y < CFG.height + 60) {
     w.stairs.push(makeStair(w, y));
