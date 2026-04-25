@@ -47,7 +47,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '左右移動接住從天而降的球，漏太多就結束。',
     emoji: '🏀',
     tags: ['敏捷'],
-    implemented: false,
+    implemented: true,
   },
   {
     slug: 'tetris',
