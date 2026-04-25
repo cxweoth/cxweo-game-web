@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- 遊戲手把：透明背景，紫色（indigo-500）配白；對亮/暗模式分頁都明顯 -->
+  <rect x="4" y="22" width="56" height="26" rx="13" fill="#6366f1"/>
+  <!-- D-pad（左） -->
+  <rect x="12" y="33" width="12" height="4" rx="1.2" fill="#ffffff"/>
+  <rect x="16" y="29" width="4" height="12" rx="1.2" fill="#ffffff"/>
+  <!-- 四顆按鍵，菱形排列（右） -->
+  <circle cx="44" cy="31" r="2.5" fill="#ffffff"/>
+  <circle cx="50" cy="35" r="2.5" fill="#ffffff"/>
+  <circle cx="38" cy="35" r="2.5" fill="#ffffff"/>
+  <circle cx="44" cy="39" r="2.5" fill="#ffffff"/>
+</svg>
