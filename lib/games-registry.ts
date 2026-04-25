@@ -55,7 +55,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '堆疊方塊消除整行，速度會隨等級加快。',
     emoji: '🟦',
     tags: ['經典', '反應'],
-    implemented: false,
+    implemented: true,
   },
   {
     slug: 'stairs',
