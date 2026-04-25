@@ -25,3 +25,13 @@ dialog[open] {
   from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* 自訂遊戲容器在 focus 時不要顯示瀏覽器預設外框（含 box-shadow 形式的 focus ring）。
+   Chromium 系（Edge / Chrome）有時即使 outline-none 也會用 box-shadow 畫白色 focus 框，
+   故一併蓋掉。鍵盤可達性靠元件自身的內部 cursor 提示。 */
+.no-focus-ring:focus,
+.no-focus-ring:focus-visible,
+.no-focus-ring:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}

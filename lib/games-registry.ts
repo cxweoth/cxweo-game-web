@@ -23,7 +23,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '15×15 棋盤，先連五子者勝。支援雙人對戰與簡易 AI。',
     emoji: '⚫',
     tags: ['策略', '雙人'],
-    implemented: false,
+    implemented: true,
   },
   {
     slug: 'catch-ball',
