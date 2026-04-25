@@ -146,6 +146,7 @@ README.md                      本地開發 + Vercel 說明
 | 五子棋 | `gomoku` | 2026-04-25 | SVG（無 Canvas） | 15×15、無禁手、PvP + 簡易 AI（單層啟發式打分，防守權重 1.1）、AI 模式悔棋一次 2 步、結算以橫幅顯示。戰績與偏好（模式 / 執色）用 `readJSON/writeJSON` 存（key：`gomoku:stats` / `gomoku:prefs`）。tabIndex 放在 wrapper `<div>` 而非 SVG 上：避免 Chromium 在 SVG 上畫 focus ring，並用 `select-none caret-transparent` + 全域 `.no-focus-ring` 抑制 caret 與 outline。 |
 | 射箭 | `archery` | 2026-04-25 | Canvas + rAF | **首款 Canvas 遊戲**，800×480 內部解析度（CSS aspect-ratio 縮放）。物理：重力 + 水平風力，蓄力決定初速、滑鼠/鍵盤調仰角、放開射出。每箭隨機風（30–180 px/s²，顯示在 HUD），蓄力時繪預瞄虛線（含風預測）。10 環 FITA 配色標靶；落地判定用 segment-crossing 找箭與標靶平面交點再內插。物理 / 渲染狀態都在 ref，每幀 imperative 繪圖，**不**透過 React state 觸發 re-render；只在「箭落下」事件 dispatch 給 hook。最佳分用 `setHighScore('archery', total)` 存。**屬於 PROJECT.md 規格外的第 7 款**。 |
 | 弓手獵怪 | `monster-hunt` | 2026-04-25 | Canvas + rAF | **規格外第 8 款**。雙方對射：玩家 HP 10、怪物 HP 5；怪物會 AI 飄移並週期射火球。為了維持 60fps，所有每幀變動的東西在單一 `worldRef` 物件裡（見 `physics.ts`），React state 只管 HP 與結束狀態。死亡瞬間有完整演出：能量爆裂環、26 顆飛散粒子（含重力與摩擦）、螢幕震動 380ms、屍體灰化旋轉下沉、「擊敗！/ K.O.」浮字。檔案拆成 `types`/`fx`/`physics`/`render-bg`/`render-actors`/`render-hud`/`render`/`useMonsterHunt`/`MonsterHunt`/`MonsterHuntCanvas` 以維持單檔 ≤ 300 行。 |
+| 接球 | `catch-ball` | 2026-04-25 | Canvas + rAF | PROJECT.md 規格內 Phase 5。底部籃子接從上掉的彩球，金球（8% 機率）+5、普通 +1；3 顆紅心，漏球 −1。難度依「累計接球數」漸增：球速最高 ×3、生成間隔從 1500ms → 500ms（30 球達峰）。架構同 monster-hunt（單一 `worldRef` + `physics.ts` + 純函式 `render.ts`），但因規模小未拆 render，整檔仍在 300 行內。最佳分用 `setHighScore('catch-ball', total)`。 |
 
 ## 6. 程式碼慣例
 
