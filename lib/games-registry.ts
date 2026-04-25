@@ -71,7 +71,7 @@ export const GAMES: readonly GameMeta[] = [
     description: '射出同色泡泡消除，不讓泡泡堆到底線。',
     emoji: '🫧',
     tags: ['益智'],
-    implemented: false,
+    implemented: true,
   },
 ];
 

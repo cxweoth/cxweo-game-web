@@ -149,6 +149,7 @@ README.md                      本地開發 + Vercel 說明
 | 接球 | `catch-ball` | 2026-04-25 | Canvas + rAF | PROJECT.md 規格內 Phase 5。底部籃子接從上掉的彩球，金球（8% 機率）+5、普通 +1；3 顆紅心，漏球 −1。難度依「累計接球數」漸增：球速最高 ×3、生成間隔從 1500ms → 500ms（30 球達峰）。架構同 monster-hunt（單一 `worldRef` + `physics.ts` + 純函式 `render.ts`），但因規模小未拆 render，整檔仍在 300 行內。最佳分用 `setHighScore('catch-ball', total)`。 |
 | 俄羅斯方塊 | `tetris` | 2026-04-26 | Canvas（離散，用 setTimeout 不用 rAF） | PROJECT.md 規格內 Phase 6。10×20、7 種方塊、7-bag 隨機、鬼影預覽、消行記分、按等級加速、軟降/硬降、暫停。沒實作 SRS 踢牆（撞到就拒絕旋轉）。動畫以 React state + useEffect+setTimeout 驅動，因為 Tetris 的世界是格狀離散的，rAF 反而過頭。除了鍵盤外提供 5 顆觸控按鍵（←/↻/→/↓ 軟降/DROP）給手機。最佳分 `setHighScore('tetris')`。 |
 | 下樓梯 | `stairs` | 2026-04-26 | Canvas + rAF（直式 480×720） | PROJECT.md 規格內 Phase 7。樓梯持續上捲、角色重力下墜、踩到 normal +1、fragile +2（會碎）、spike −1 ❤、頭頂尖刺天花板直接 game over。連續落地用「上一幀腳底是否在 stair 上方」防穿透。`onStairId` 紀錄角色站著的階梯，下一幀讓角色跟著一起捲動，避免被抛在後面。隨深度漸增捲動速度（110 → 240 px/s）。最佳分 `setHighScore('stairs')`。 |
+| 泡泡龍 | `bubble-shooter` | 2026-04-26 | Canvas + rAF（直式 480×720） | PROJECT.md 規格內 Phase 8（最終一款）。蜂巢座標 12 欄、奇偶列偏移半格；五色（紅/藍/綠/黃/紫）。砲管瞄準（mouse 跟隨 / 鍵盤 ←→ 微調）、射出後撞牆反彈、撞既有泡泡 → snap 到最近相鄰空格。落點 BFS 找同色 ≥3 連通即消，再執行「漂浮泡泡」掉落（從第 0 列 BFS,沒被連到的全掉）。連續 7 次未消整盤往下推一列;泡泡接觸 loseRow 紅色虛線 → 失敗;清空整盤 → 勝利。下一顆顏色只從畫面殘存的色挑（避免發出絕對沒用的色）。最佳分 `setHighScore('bubble-shooter')`。 |
 
 ## 6. 程式碼慣例
 
