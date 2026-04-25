@@ -8,11 +8,25 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://game.cxweo.com'),
   title: {
     default: 'Mini Games Hub',
     template: '%s · Mini Games Hub',
   },
-  description: '純前端小遊戲集合：踩地雷、五子棋、俄羅斯方塊等經典遊戲。',
+  description: '純前端小遊戲集合：踩地雷、五子棋、射箭、弓手獵怪等經典與原創小品。',
+  openGraph: {
+    type: 'website',
+    siteName: 'Mini Games Hub',
+    title: 'Mini Games Hub',
+    description: '純前端小遊戲集合，每天新增一款遊戲。',
+    url: 'https://game.cxweo.com',
+    locale: 'zh_TW',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Mini Games Hub',
+    description: '純前端小遊戲集合，每天新增一款遊戲。',
+  },
 };
 
 export const viewport: Viewport = {

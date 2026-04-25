@@ -3,6 +3,8 @@
 純前端小遊戲合集，每天新增一款遊戲。使用 **Next.js 16 + React 19 + TypeScript +
 Tailwind CSS 4**，部署於 **Vercel**。
 
+🎮 **線上玩**：[https://game.cxweo.com/](https://game.cxweo.com/)
+
 > AI agent 協作規則請讀 [`CLAUDE.md`](./CLAUDE.md) 與 [`PROJECT.md`](./PROJECT.md)。
 
 ## 本地開發
@@ -37,9 +39,13 @@ types/          共用型別（GameStatus, GameMeta）
 
 ## 部署（Vercel）
 
+正式站：[`game.cxweo.com`](https://game.cxweo.com/)（推送 `main` 會自動部署，
+feature 分支會生成 Preview URL）。
+
+要從零連接時：
 1. 在 Vercel 匯入 GitHub repo（`cxweoth/cxweo-game-web`）。
 2. Vercel 會自動偵測 Next.js → 點 Deploy。
-3. 往後推送 `main` 會自動部署；feature 分支可用 Preview Deployment 預覽。
+3. 在 Vercel Project → Settings → Domains 綁定自訂網域。
 
 ## 規則速記
 

@@ -23,6 +23,7 @@ Next.js 13/14 慣例有差：
 - **目標**：前端小遊戲合集網站，每天新增一款遊戲，長期累積。
 - **技術棧**：Next.js 16 (App Router) + React 19 + TypeScript (strict) + Tailwind CSS 4 + pnpm。
 - **部署**：Vercel（連接 GitHub repo，推送 main 自動部署）。
+- **正式站**：https://game.cxweo.com/
 - **Repo**：`git@github.com:cxweoth/cxweo-game-web.git`
 - **硬規則**：
   - 純前端，**不做**需要伺服器 / DB / 後端 API 的功能。
