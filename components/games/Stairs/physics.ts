@@ -103,61 +103,73 @@ export function tickPhysics(
   }
   world.char.x = clamp(world.char.x, CFG.charW / 2, CFG.width - CFG.charW / 2);
 
-  // 2) 上一幀站在 stair 上 → 角色跟著 stair 一起捲動
+  // 2) 樓梯捲動
   const speed = currentScrollSpeed(world.scrolled);
-  if (world.onStairId !== null) {
-    world.char.y -= speed * dt;
-  }
-
-  // 3) 樓梯捲動
   for (const s of world.stairs) s.y -= speed * dt;
   world.scrolled += speed * dt;
 
-  // 4) 重力
-  const prevBottom = world.char.y + CFG.charH;
-  world.char.vy = Math.min(world.char.vy + CFG.gravity * dt, CFG.maxVy);
-  world.char.y += world.char.vy * dt;
-
-  // 5) 落點偵測（只在下墜時、且本幀「跨過」stair 上緣才算）
-  let landed: Stair | null = null;
-  if (world.char.vy > 0) {
+  // 3) 在 stair 上時，直接把角色 y 同步到 stair 頂面、清重力。
+  //    避免「移動角色 → 移動樓梯 → 重力 → 落點偵測」這條路徑因浮點誤差
+  //    而判定為「沒踩穩」造成持續 onStairId = null → 重力下墜的詭異效果。
+  if (world.onStairId !== null) {
+    const stair = world.stairs.find((s) => s.id === world.onStairId);
     const cl = world.char.x - CFG.charW / 2;
     const cr = world.char.x + CFG.charW / 2;
-    const newBottom = world.char.y + CFG.charH;
-    for (const s of world.stairs) {
-      if (s.broken) continue;
-      if (cr < s.x || cl > s.x + s.w) continue;
-      if (prevBottom <= s.y && newBottom >= s.y) {
-        if (!landed || s.y < landed.y) landed = s;
-      }
+    const stillOn =
+      !!stair && !stair.broken && cr >= stair.x && cl <= stair.x + stair.w;
+    if (stillOn && stair) {
+      world.char.y = stair.y - CFG.charH;
+      world.char.vy = 0;
+    } else {
+      world.onStairId = null;
     }
   }
 
-  if (landed) {
-    world.char.y = landed.y - CFG.charH;
-    world.char.vy = 0;
-    world.onStairId = landed.id;
+  // 4) 不在 stair 上 → 套重力 + 落點偵測（搜「上一幀腳底還在 stair 上方,
+  //    這一幀已跨過 stair 上緣」的最上面那個 stair）
+  if (world.onStairId === null) {
+    const prevBottom = world.char.y + CFG.charH;
+    world.char.vy = Math.min(world.char.vy + CFG.gravity * dt, CFG.maxVy);
+    world.char.y += world.char.vy * dt;
 
-    // 第一次踩上 → 計分 / 受擊 / 破裂
-    if (!world.steppedIds.has(landed.id)) {
-      world.steppedIds.add(landed.id);
-      if (landed.type === 'spike') {
-        if (nowMs > world.char.invulnUntil) {
-          world.char.invulnUntil = nowMs + CFG.invulnMs;
-          world.hurtFlashUntil = nowMs + 300;
-          onDamage(1);
+    let landed: Stair | null = null;
+    if (world.char.vy > 0) {
+      const cl = world.char.x - CFG.charW / 2;
+      const cr = world.char.x + CFG.charW / 2;
+      const newBottom = world.char.y + CFG.charH;
+      for (const s of world.stairs) {
+        if (s.broken) continue;
+        if (cr < s.x || cl > s.x + s.w) continue;
+        if (prevBottom <= s.y && newBottom >= s.y) {
+          if (!landed || s.y < landed.y) landed = s;
         }
-      } else if (landed.type === 'fragile') {
-        landed.broken = true;
-        onScore(2);
-      } else {
-        onScore(1);
       }
-    } else if (landed.type === 'fragile' && !landed.broken) {
-      landed.broken = true;
     }
-  } else {
-    world.onStairId = null;
+
+    if (landed) {
+      world.char.y = landed.y - CFG.charH;
+      world.char.vy = 0;
+      world.onStairId = landed.id;
+
+      // 第一次踩上 → 計分 / 受擊 / 破裂
+      if (!world.steppedIds.has(landed.id)) {
+        world.steppedIds.add(landed.id);
+        if (landed.type === 'spike') {
+          if (nowMs > world.char.invulnUntil) {
+            world.char.invulnUntil = nowMs + CFG.invulnMs;
+            world.hurtFlashUntil = nowMs + 300;
+            onDamage(1);
+          }
+        } else if (landed.type === 'fragile') {
+          landed.broken = true;
+          onScore(2);
+        } else {
+          onScore(1);
+        }
+      } else if (landed.type === 'fragile' && !landed.broken) {
+        landed.broken = true;
+      }
+    }
   }
 
   // 6) 天花板：直接判輸（扣滿 HP）
