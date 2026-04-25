@@ -34,6 +34,14 @@ export const GAMES: readonly GameMeta[] = [
     implemented: true,
   },
   {
+    slug: 'monster-hunt',
+    name: '弓手獵怪',
+    description: '對怪物射箭，邊射邊閃避火球。命中 5 次勝、被擊中 10 次敗。',
+    emoji: '👹',
+    tags: ['敏捷', '反射'],
+    implemented: true,
+  },
+  {
     slug: 'catch-ball',
     name: '接球',
     description: '左右移動接住從天而降的球，漏太多就結束。',
