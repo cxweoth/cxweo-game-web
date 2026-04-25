@@ -31,8 +31,14 @@ export function TetrisCanvas({
   onSoftDrop,
   onTogglePause,
 }: Props) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previewRef = useRef<HTMLCanvasElement | null>(null);
+
+  // 掛載即搶焦點，讓鍵盤馬上能用
+  useEffect(() => {
+    wrapperRef.current?.focus({ preventScroll: true });
+  }, []);
 
   // 主棋盤每次 props 變動就重畫
   useEffect(() => {
@@ -92,6 +98,7 @@ export function TetrisCanvas({
 
   return (
     <div
+      ref={wrapperRef}
       tabIndex={0}
       role="application"
       aria-label="俄羅斯方塊"
