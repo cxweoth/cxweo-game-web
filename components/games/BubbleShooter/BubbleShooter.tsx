@@ -19,7 +19,7 @@ export function BubbleShooter() {
 
   return (
     <GameShell
-      title="泡泡龍"
+      title="泡泡連消"
       controls={
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="secondary" size="sm" onClick={restart}>

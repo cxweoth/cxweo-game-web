@@ -26,19 +26,24 @@ export function CatchBallCanvas({
   onMiss,
   resetKey,
 }: Props) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const worldRef = useRef<World>(createWorld());
   const keysRef = useRef<Set<string>>(new Set());
+  /** 滑鼠 / 觸控 X(畫布內);null = 鍵盤接管 */
+  const mouseXRef = useRef<number | null>(null);
 
   const propsRef = useRef({ status, score, lives, best, onCatch, onMiss });
   useEffect(() => {
     propsRef.current = { status, score, lives, best, onCatch, onMiss };
   });
 
-  // 重玩 → 重建 World
+  // 掛載 / 重玩 → 重建 World 並把焦點搶到 wrapper,讓鍵盤馬上能用
   useEffect(() => {
     worldRef.current = createWorld();
     keysRef.current.clear();
+    mouseXRef.current = null;
+    wrapperRef.current?.focus({ preventScroll: true });
   }, [resetKey]);
 
   // rAF 主迴圈
@@ -64,6 +69,7 @@ export function CatchBallCanvas({
         now,
         p.status === 'playing',
         keysRef.current,
+        mouseXRef.current,
         p.onCatch,
         p.onMiss,
       );
@@ -91,13 +97,12 @@ export function CatchBallCanvas({
 
   // --- 輸入 ---
 
-  const setPaddleFromClient = (clientX: number) => {
+  const setMouseFromClient = (clientX: number) => {
     const c = canvasRef.current;
     if (!c) return;
     const rect = c.getBoundingClientRect();
-    const xInCanvas = ((clientX - rect.left) / rect.width) * CFG.width;
-    worldRef.current.paddleX = clamp(
-      xInCanvas,
+    mouseXRef.current = clamp(
+      ((clientX - rect.left) / rect.width) * CFG.width,
       CFG.paddleW / 2,
       CFG.width - CFG.paddleW / 2,
     );
@@ -105,11 +110,11 @@ export function CatchBallCanvas({
 
   const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    setPaddleFromClient(e.clientX);
+    setMouseFromClient(e.clientX);
   };
 
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
-    setPaddleFromClient(e.clientX);
+    setMouseFromClient(e.clientX);
   };
 
   const handlePointerUp = (e: PointerEvent<HTMLDivElement>) => {
@@ -127,7 +132,11 @@ export function CatchBallCanvas({
       e.code === 'ArrowRight' ||
       e.code === 'KeyA' ||
       e.code === 'KeyD';
-    if (blocked) e.preventDefault();
+    if (blocked) {
+      e.preventDefault();
+      // 鍵盤一按 → 解除滑鼠追蹤,讓鍵盤可以從當前位置微調
+      mouseXRef.current = null;
+    }
     if (e.repeat) return;
     keysRef.current.add(e.code);
   };
@@ -138,6 +147,7 @@ export function CatchBallCanvas({
 
   return (
     <div
+      ref={wrapperRef}
       tabIndex={0}
       role="application"
       aria-label="接球"

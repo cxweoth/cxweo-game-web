@@ -45,7 +45,7 @@ export const GAMES: readonly GameMeta[] = [
     slug: 'catch-ball',
     name: '接球',
     description: '左右移動接住從天而降的球，漏太多就結束。',
-    emoji: '🏀',
+    emoji: '🧺',
     tags: ['敏捷'],
     implemented: true,
   },
@@ -67,7 +67,7 @@ export const GAMES: readonly GameMeta[] = [
   },
   {
     slug: 'bubble-shooter',
-    name: '泡泡龍',
+    name: '泡泡連消',
     description: '射出同色泡泡消除，不讓泡泡堆到底線。',
     emoji: '🫧',
     tags: ['益智'],

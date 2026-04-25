@@ -85,11 +85,16 @@ export function tickPhysics(
   nowMs: number,
   alive: boolean,
   keys: ReadonlySet<string>,
+  /** 滑鼠 / 觸控位置(畫布內 X);null 表示交給鍵盤 */
+  mouseX: number | null,
   onCatch: (points: number) => void,
   onMiss: () => void,
 ): void {
   if (alive) {
-    // 鍵盤移動籃子(滑鼠 / 觸控位置由外部直接寫 paddleX)
+    // 1) 滑鼠追蹤(若有);鍵盤再從這個基準微調
+    if (mouseX !== null) {
+      world.paddleX = mouseX;
+    }
     if (keys.has('ArrowLeft') || keys.has('KeyA')) {
       world.paddleX -= CFG.paddleSpeedKey * dt;
     }

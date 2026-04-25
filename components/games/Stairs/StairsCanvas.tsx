@@ -25,6 +25,7 @@ export function StairsCanvas({
   onDamage,
   resetKey,
 }: Props) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const worldRef = useRef<World>(createWorld());
   const keysRef = useRef<Set<string>>(new Set());
@@ -40,6 +41,8 @@ export function StairsCanvas({
     worldRef.current = createWorld();
     keysRef.current.clear();
     mouseXRef.current = null;
+    // 重玩 / 掛載 → 搶焦點，讓鍵盤馬上能用
+    wrapperRef.current?.focus({ preventScroll: true });
   }, [resetKey]);
 
   useEffect(() => {
@@ -134,6 +137,7 @@ export function StairsCanvas({
 
   return (
     <div
+      ref={wrapperRef}
       tabIndex={0}
       role="application"
       aria-label="下樓梯"

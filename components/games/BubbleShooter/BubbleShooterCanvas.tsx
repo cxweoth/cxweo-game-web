@@ -161,7 +161,7 @@ export function BubbleShooterCanvas({
     <div
       tabIndex={0}
       role="application"
-      aria-label="泡泡龍"
+      aria-label="泡泡連消"
       className={cn(
         'no-focus-ring',
         'mx-auto block w-full max-w-[480px] touch-manipulation',
