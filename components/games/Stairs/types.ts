@@ -9,13 +9,18 @@ export const CFG = {
   height: 720,
 
   /** 天花板 y；角色頭頂超過視為被壓死 */
-  ceilingY: 60,
+  ceilingY: 50,
 
   // 角色
   charW: 28,
   charH: 36,
+  /** 出生 X(畫布水平中央) */
   charXInit: 240,
-  charYInit: 200,
+  /**
+   * 出生 Y。要與 ceilingY 留足夠緩衝(~250px),否則玩家還沒反應
+   * 就被天花板擠扁。230 px 緩衝 / 90 px/s 捲動 = 約 2.5s 反應時間。
+   */
+  charYInit: 280,
   /** 鍵盤每秒水平速度 */
   charSpeedKey: 380,
 
@@ -23,11 +28,11 @@ export const CFG = {
   gravity: 1300,
   /** 防穿透的下墜上限 */
   maxVy: 720,
-  /** 樓梯每秒往上捲動 */
-  scrollSpeedStart: 110,
+  /** 樓梯每秒往上捲動(初速;會隨深度漸增) */
+  scrollSpeedStart: 90,
   /** 隨深度漸增到此 */
-  scrollSpeedMax: 240,
-  /** 每深度 scoreDepthRamp 加速一次 */
+  scrollSpeedMax: 230,
+  /** 多少累積像素達到上限 */
   scrollDepthRamp: 30,
 
   // 樓梯
