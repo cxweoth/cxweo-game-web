@@ -2,17 +2,36 @@
 
 import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from 'react';
 import { cn, clamp } from '@/lib/utils';
-import { CFG } from './types';
+import { CFG, type Images } from './types';
 import { drawScene } from './render';
-import { createWorld, tickPhysics, type World } from './physics';
+import { createWorld, tickPhysics, type World } from './game';
+import { playSound, unlockAudio } from './sound';
+
+const ASSET_BASE = '/games/stairs';
+
+function preloadImages(): Images {
+  const make = (file: string): HTMLImageElement => {
+    const img = new Image();
+    img.src = `${ASSET_BASE}/${file}`;
+    return img;
+  };
+  return {
+    bg: make('bg.jpg'),
+    top: make('top.jpg'),
+    block: make('block.jpg'),
+    spring: make('jblock2.png'),
+    conveyor: make('spic.jpg'),
+  };
+}
 
 type Props = {
   status: 'playing' | 'gameOver';
   hp: number;
   score: number;
   best: number | null;
-  onScore: (points: number) => void;
+  onScore: (delta: number) => void;
   onDamage: (amount: number) => void;
+  onHeal: (amount: number) => void;
   resetKey: number;
 };
 
@@ -23,28 +42,36 @@ export function StairsCanvas({
   best,
   onScore,
   onDamage,
+  onHeal,
   resetKey,
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const worldRef = useRef<World>(createWorld());
   const keysRef = useRef<Set<string>>(new Set());
-  /** 滑鼠/觸控時的目標 X(畫布內座標),null = 不使用 */
+  /** 滑鼠 / 觸控目標 X(畫布內);null = 鍵盤接管 */
   const mouseXRef = useRef<number | null>(null);
+  const imagesRef = useRef<Images | null>(null);
 
-  const propsRef = useRef({ status, hp, score, best, onScore, onDamage });
   useEffect(() => {
-    propsRef.current = { status, hp, score, best, onScore, onDamage };
+    imagesRef.current = preloadImages();
+  }, []);
+
+  // props 鏡射
+  const propsRef = useRef({ status, hp, score, best, onScore, onDamage, onHeal });
+  useEffect(() => {
+    propsRef.current = { status, hp, score, best, onScore, onDamage, onHeal };
   });
 
+  // 重玩 / 掛載 → 重置 World + 搶焦點
   useEffect(() => {
     worldRef.current = createWorld();
     keysRef.current.clear();
     mouseXRef.current = null;
-    // 重玩 / 掛載 → 搶焦點，讓鍵盤馬上能用
     wrapperRef.current?.focus({ preventScroll: true });
   }, [resetKey]);
 
+  // rAF 主迴圈
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -61,27 +88,36 @@ export function StairsCanvas({
       totalTime += dt;
 
       const p = propsRef.current;
+      const w = worldRef.current;
+      // 包一層 onDamage:在 dispatch 給 React 之前先記錄受傷時刻,
+      // renderer 會根據 elapsedSec - lastDamageAtSec 算出閃紅 alpha
+      const onDamageWithFlash = (amount: number) => {
+        w.lastDamageAtSec = w.elapsedSec;
+        p.onDamage(amount);
+      };
       tickPhysics(
-        worldRef.current,
+        w,
         dt,
-        now,
         p.status === 'playing',
         keysRef.current,
         mouseXRef.current,
-        p.onDamage,
+        onDamageWithFlash,
         p.onScore,
+        p.onHeal,
+        playSound,
       );
 
-      const w = worldRef.current;
       drawScene(ctx, {
         char: w.char,
         stairs: w.stairs,
         hp: p.hp,
         score: p.score,
         best: p.best,
-        time: totalTime,
-        hurtFlashUntil: w.hurtFlashUntil,
-        nowMs: now,
+        walkAnim: w.walkAnim,
+        totalTime,
+        elapsedSec: w.elapsedSec,
+        lastDamageAtSec: w.lastDamageAtSec,
+        images: imagesRef.current,
       });
 
       rafId = requestAnimationFrame(tick);
@@ -105,6 +141,7 @@ export function StairsCanvas({
   const handlePointerDown = (e: PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     setMouseFromClient(e.clientX);
+    unlockAudio();
   };
   const handlePointerMove = (e: PointerEvent<HTMLDivElement>) => {
     setMouseFromClient(e.clientX);
@@ -119,6 +156,7 @@ export function StairsCanvas({
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (propsRef.current.status !== 'playing') return;
+    unlockAudio();
     const blocked =
       e.code === 'ArrowLeft' ||
       e.code === 'ArrowRight' ||
@@ -126,7 +164,7 @@ export function StairsCanvas({
       e.code === 'KeyD';
     if (blocked) {
       e.preventDefault();
-      mouseXRef.current = null; // 鍵盤接管
+      mouseXRef.current = null;
     }
     if (e.repeat) return;
     keysRef.current.add(e.code);
@@ -140,7 +178,7 @@ export function StairsCanvas({
       ref={wrapperRef}
       tabIndex={0}
       role="application"
-      aria-label="下樓梯"
+      aria-label="小朋友下樓梯"
       className={cn(
         'no-focus-ring',
         'mx-auto block w-full max-w-[480px] touch-manipulation',
