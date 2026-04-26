@@ -17,6 +17,25 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Chromium / Edge 即使在非 input 上點純文字,也會放一個閃爍的 text caret(尤其
+   開啟 caret browsing 時更明顯)。本站沒有可編輯文字,所以對所有元素直接把
+   caret 蓋成透明;只有真正會輸入的元素 (input/textarea/select/contenteditable)
+   才強制讓 caret 可見。用 universal selector + !important 確保無視 inherit 鏈
+   或瀏覽器 UA stylesheet 的覆寫。 */
+*,
+*::before,
+*::after {
+  caret-color: transparent !important;
+}
+
+input,
+textarea,
+select,
+[contenteditable="true"],
+[contenteditable=""] {
+  caret-color: auto !important;
+}
+
 /* 把系統預設的 dialog backdrop 做更柔和的過場 */
 dialog[open] {
   animation: dialog-in 120ms ease-out;

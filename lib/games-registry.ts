@@ -59,7 +59,7 @@ export const GAMES: readonly GameMeta[] = [
   },
   {
     slug: 'stairs',
-    name: '下樓梯',
+    name: '小朋友下樓梯',
     description: '踩著台階往下，避開天花板與刺。',
     emoji: '🪜',
     tags: ['敏捷'],

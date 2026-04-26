@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getHighScore, setHighScore } from '@/lib/storage';
 import { CFG, SLUG } from './types';
 
+/**
+ * 回合層級狀態(HP / score / status / best)。物理在 game.ts、
+ * 渲染在 render.ts、輸入與 rAF 在 StairsCanvas.tsx。
+ */
 export function useStairs() {
   const [status, setStatus] = useState<'playing' | 'gameOver'>('playing');
   const [score, setScore] = useState<number>(0);
@@ -16,8 +20,8 @@ export function useStairs() {
     setBest(getHighScore(SLUG));
   }, []);
 
-  const onScore = useCallback((points: number) => {
-    scoreRef.current += points;
+  const onScore = useCallback((delta: number) => {
+    scoreRef.current += delta;
     setScore(scoreRef.current);
   }, []);
 
@@ -34,6 +38,10 @@ export function useStairs() {
     });
   }, []);
 
+  const onHeal = useCallback((amount: number) => {
+    setHP((h) => Math.min(CFG.maxHP, h + amount));
+  }, []);
+
   const restart = useCallback(() => {
     scoreRef.current = 0;
     setScore(0);
@@ -41,5 +49,5 @@ export function useStairs() {
     setStatus('playing');
   }, []);
 
-  return { status, score, hp, best, onScore, onDamage, restart };
+  return { status, score, hp, best, onScore, onDamage, onHeal, restart };
 }
