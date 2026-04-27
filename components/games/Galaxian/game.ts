@@ -110,9 +110,8 @@ export function tickPhysics(
     onScore(CFG.scoreClearWaveBonus);
     onSound('wave');
     world.wave += 1;
+    // spawnWave 會根據新的 wave 號決定 captains 數、起始 swarmY、起始方向
     spawnWave(ctx);
-    // 下一波整體下移,難度漸增
-    world.swarmY = Math.min((world.wave - 1) * 8, 60);
   }
 }
 
@@ -161,7 +160,9 @@ function tickBullets(w: World, dt: number): void {
   for (const b of w.bullets) {
     if (!b.alive) continue;
     b.y -= CFG.bulletSpeed * dt;
-    if (b.y + CFG.bulletH < 0) b.alive = false;
+    // 讓子彈飛到畫面上方再 60px 才回收 — returning 蜜蜂會在 y=-40 重生,
+    // 太早回收會讓「最後一隻歸隊蜜蜂」永遠打不到
+    if (b.y + CFG.bulletH < -60) b.alive = false;
   }
 }
 
@@ -196,7 +197,11 @@ function tickBulletHits(
       ) {
         bullet.alive = false;
         bee.alive = false;
-        onScore(bee.state === 'diving' ? CFG.scoreDivingBee : CFG.scoreStandingBee);
+        const baseScore =
+          bee.state === 'diving' ? CFG.scoreDivingBee : CFG.scoreStandingBee;
+        const finalScore =
+          bee.type === 'captain' ? baseScore * CFG.captainScoreMultiplier : baseScore;
+        onScore(finalScore);
         onSound('explode');
         break;
       }
