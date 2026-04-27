@@ -71,6 +71,22 @@ export const CFG = {
   scoreStandingBee: 10,
   scoreDivingBee: 50,
   scoreClearWaveBonus: 500,
+  /** 隊長(captain,紅蜜蜂)分數倍率 */
+  captainScoreMultiplier: 2,
+
+  // 每波難度成長 — 用 1 + (wave-1) * scale 線性放大,封頂避免後期太誇張
+  /** 每波 swarm speed 加倍係數 */
+  waveSpeedScalePerWave: 0.12,
+  /** 每波 dive 間隔縮短係數 */
+  waveIntervalScalePerWave: 0.1,
+  /** 每波 dive 速度加成係數 */
+  waveDiveSpeedScalePerWave: 0.06,
+  /** 每波 bomb 投彈率加倍係數 */
+  waveBombScalePerWave: 0.15,
+  /** 整體難度倍率上限 */
+  waveScaleCap: 2.5,
+  /** batch size = 1 + floor((wave-1) / 隔幾波 +1) */
+  waveDiveBatchPerN: 3,
 
   // 受傷後角色閃紅
   damageFlashDuration: 0.6,
@@ -96,11 +112,15 @@ export type BeeState =
   /** 俯衝衝出底部、從上面飛回來歸隊 */
   | 'returning';
 
+/** 一般蜜蜂 / 隊長蜜蜂 — 隊長用紅色,分數加倍 */
+export type BeeType = 'regular' | 'captain';
+
 export type Bee = {
   id: number;
   /** 在 5×6 矩陣裡的 row / col;歸隊時用來算回到哪個 cell */
   row: number;
   col: number;
+  type: BeeType;
   /** 世界座標 — formation 狀態時 = swarm 原點 + cell offset */
   x: number;
   y: number;
@@ -110,6 +130,8 @@ export type Bee = {
   /** diving 時鎖定的單位向量 + 速度;朝這個方向直線飛 */
   vx: number;
   vy: number;
+  /** returning 狀態下累計的時間;太久就強制歸位避免卡死 */
+  returnT: number;
   /** alive=false 已被擊毀,從 world.bees 過濾掉 */
   alive: boolean;
 };
