@@ -52,7 +52,10 @@ export function Stairs() {
       instructions={
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>移動</strong>:滑鼠 / 觸控位置 = 角色目標(漸進靠近);鍵盤 <kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd>
+            <strong>手機 / 觸控</strong>:用畫面下方的 <kbd>←</kbd> <kbd>→</kbd> 大按鈕(按住連續移動);也可在遊戲畫面內滑動手指當作目標位置(放開即停)
+          </li>
+          <li>
+            <strong>桌機鍵盤</strong>:<kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd>;滑鼠拖移到位置也行
           </li>
           <li>
             <strong>6 種階梯</strong>:
@@ -70,21 +73,20 @@ export function Stairs() {
         </ul>
       }
     >
-      <div className="relative">
-        <StairsCanvas
-          status={status}
-          hp={hp}
-          score={score}
-          best={best}
-          onScore={onScore}
-          onDamage={onDamage}
-          onHeal={onHeal}
-          resetKey={resetKey}
-        />
+      <StairsCanvas
+        status={status}
+        hp={hp}
+        score={score}
+        best={best}
+        onScore={onScore}
+        onDamage={onDamage}
+        onHeal={onHeal}
+        resetKey={resetKey}
+      >
         {isOver ? (
           <ResultPanel score={score} best={best} isBest={isBest} onRestart={handleRestart} />
         ) : null}
-      </div>
+      </StairsCanvas>
     </GameShell>
   );
 }
