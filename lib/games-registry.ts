@@ -73,6 +73,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['益智'],
     implemented: true,
   },
+  {
+    slug: 'galaxian',
+    name: '小蜜蜂',
+    description: '經典 Galaxian 風格射擊；消滅蜜蜂方陣，閃避俯衝攻擊。',
+    emoji: '🐝',
+    tags: ['射擊', '經典'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
