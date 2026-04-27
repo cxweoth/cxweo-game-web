@@ -91,6 +91,7 @@ export function tickPhysics(
   shootRequested: boolean,
   onScore: (delta: number) => void,
   onDamage: () => void,
+  onWaveCleared: () => void,
   onSound: (kind: SoundKind) => void,
 ): void {
   if (!alive) return;
@@ -110,6 +111,8 @@ export function tickPhysics(
     onScore(CFG.scoreClearWaveBonus);
     onSound('wave');
     world.wave += 1;
+    // 通知 React 把 wave state +1,讓 HUD / 控制列同步顯示新波次
+    onWaveCleared();
     // spawnWave 會根據新的 wave 號決定 captains 數、起始 swarmY、起始方向
     spawnWave(ctx);
   }

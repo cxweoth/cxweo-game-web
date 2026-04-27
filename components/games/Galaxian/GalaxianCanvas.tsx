@@ -15,6 +15,7 @@ type Props = {
   wave: number;
   onScore: (delta: number) => void;
   onDamage: () => void;
+  onWaveCleared: () => void;
   resetKey: number;
 };
 
@@ -26,6 +27,7 @@ export function GalaxianCanvas({
   wave,
   onScore,
   onDamage,
+  onWaveCleared,
   resetKey,
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -38,9 +40,9 @@ export function GalaxianCanvas({
   const shootHeldRef = useRef(false);
 
   // props 鏡射(避免 rAF closure 抓到舊值)
-  const propsRef = useRef({ status, score, best, lives, wave, onScore, onDamage });
+  const propsRef = useRef({ status, score, best, lives, wave, onScore, onDamage, onWaveCleared });
   useEffect(() => {
-    propsRef.current = { status, score, best, lives, wave, onScore, onDamage };
+    propsRef.current = { status, score, best, lives, wave, onScore, onDamage, onWaveCleared };
   });
 
   // 重玩 / 掛載 → 重置 World + 搶焦點
@@ -79,6 +81,7 @@ export function GalaxianCanvas({
         shootHeldRef.current,
         p.onScore,
         p.onDamage,
+        p.onWaveCleared,
         playSound,
       );
 
