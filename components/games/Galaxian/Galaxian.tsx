@@ -9,7 +9,8 @@ import { useGalaxian } from './useGalaxian';
 import { CFG } from './types';
 
 export function Galaxian() {
-  const { status, score, lives, wave, best, onScore, onDamage, restart } = useGalaxian();
+  const { status, score, lives, wave, best, onScore, onDamage, onWaveCleared, restart } =
+    useGalaxian();
   const [resetKey, setResetKey] = useState(0);
 
   // 同步 restart + 重建 World;確保 React 把兩個 state 一起 batch
@@ -78,6 +79,7 @@ export function Galaxian() {
           wave={wave}
           onScore={onScore}
           onDamage={onDamage}
+          onWaveCleared={onWaveCleared}
           resetKey={resetKey}
         />
         {isOver ? (
