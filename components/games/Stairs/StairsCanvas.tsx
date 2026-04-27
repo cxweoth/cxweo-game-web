@@ -1,11 +1,18 @@
 'use client';
 
-import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 import { cn, clamp } from '@/lib/utils';
 import { CFG, type Images } from './types';
 import { drawScene } from './render';
 import { createWorld, tickPhysics, type World } from './game';
 import { playSound, unlockAudio } from './sound';
+import { DirectionControls } from './DirectionControls';
 
 const ASSET_BASE = '/games/stairs';
 
@@ -33,6 +40,8 @@ type Props = {
   onDamage: (amount: number) => void;
   onHeal: (amount: number) => void;
   resetKey: number;
+  /** 結算面板等浮動內容,absolute 在 canvas 上;手機虛擬按鍵會在這外面、不被遮罩蓋住 */
+  children?: ReactNode;
 };
 
 export function StairsCanvas({
@@ -44,6 +53,7 @@ export function StairsCanvas({
   onDamage,
   onHeal,
   resetKey,
+  children,
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -152,6 +162,20 @@ export function StairsCanvas({
     } catch {
       // 忽略
     }
+    // 手指離開 → 取消游標目標,角色停下來。
+    // 沒清掉的話「最後一次手指位置」會繼續拉著角色走,在手機上特別反直覺。
+    mouseXRef.current = null;
+  };
+
+  // 虛擬方向鍵(手機主要操控介面)— 直接操作 keysRef,等同按住鍵盤箭頭。
+  // 按下時也清掉 mouseXRef,避免「拖一下後再按按鍵」兩種輸入打架。
+  const handleDirPress = (dir: -1 | 1) => {
+    mouseXRef.current = null;
+    keysRef.current.add(dir === -1 ? 'ArrowLeft' : 'ArrowRight');
+    unlockAudio();
+  };
+  const handleDirRelease = (dir: -1 | 1) => {
+    keysRef.current.delete(dir === -1 ? 'ArrowLeft' : 'ArrowRight');
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -174,37 +198,50 @@ export function StairsCanvas({
   };
 
   return (
-    <div
-      ref={wrapperRef}
-      tabIndex={0}
-      role="application"
-      aria-label="小朋友下樓梯"
-      className={cn(
-        'no-focus-ring',
-        'mx-auto block w-full max-w-[480px] touch-manipulation',
-        'overflow-hidden rounded-lg shadow-md',
-        'select-none caret-transparent',
-      )}
-      style={{
-        WebkitTapHighlightColor: 'transparent',
-        caretColor: 'transparent',
-        touchAction: 'none',
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onKeyDown={handleKeyDown}
-      onKeyUp={handleKeyUp}
-    >
-      <canvas
-        ref={canvasRef}
-        width={CFG.width}
-        height={CFG.height}
-        aria-hidden
-        className="block w-full"
-        style={{ aspectRatio: `${CFG.width} / ${CFG.height}` }}
+    <div className="flex flex-col items-stretch gap-3">
+      {/* relative 限制在「畫布」這層,result panel 透過 children 注入,
+          它的 absolute inset-0 只會蓋畫布,不會蓋到下方的虛擬按鍵 */}
+      <div className="relative mx-auto w-full max-w-[480px]">
+        <div
+          ref={wrapperRef}
+          tabIndex={0}
+          role="application"
+          aria-label="小朋友下樓梯"
+          className={cn(
+            'no-focus-ring',
+            'block w-full touch-manipulation',
+            'overflow-hidden rounded-lg shadow-md',
+            'select-none caret-transparent',
+          )}
+          style={{
+            WebkitTapHighlightColor: 'transparent',
+            caretColor: 'transparent',
+            touchAction: 'none',
+          }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
+        >
+          <canvas
+            ref={canvasRef}
+            width={CFG.width}
+            height={CFG.height}
+            aria-hidden
+            className="block w-full"
+            style={{ aspectRatio: `${CFG.width} / ${CFG.height}` }}
+          />
+        </div>
+        {children}
+      </div>
+      <DirectionControls
+        disabled={status !== 'playing'}
+        onPress={handleDirPress}
+        onRelease={handleDirRelease}
       />
     </div>
   );
 }
+
