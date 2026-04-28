@@ -54,16 +54,19 @@ export function Galaxian() {
       instructions={
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>手機 / 觸控</strong>:畫面下方左側 <kbd>←</kbd> <kbd>→</kbd> 控制移動,右側紅色 <kbd>🔫 射擊</kbd> 按住連射;也可以用手指在遊戲畫面內滑動只移動(放開停)
+            <strong>自動射擊</strong>:遊戲進行中飛機會自動連續射擊,你只需要顧移動 / 閃避就好
           </li>
           <li>
-            <strong>桌機鍵盤</strong>:<kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd> 移動;<kbd>空白鍵</kbd> / <kbd>↑</kbd> / <kbd>W</kbd> 射擊(場上最多 4 發)
+            <strong>手機 / 觸控</strong>:畫面左下、右下角的圓形 <kbd>←</kbd> <kbd>→</kbd> 按住移動;也可以用手指在畫面內滑動指定位置(放開停)
+          </li>
+          <li>
+            <strong>桌機鍵盤</strong>:<kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd> 移動
           </li>
           <li>
             <strong>計分</strong>:站立蜜蜂 +10、俯衝中蜜蜂 +50、紅色隊長 ×2 倍分、整波清空額外 +500
           </li>
           <li>
-            <strong>勝負</strong>:全滅進下一波,蜜蜂越來越快、整體下移;被蜜蜂或炸彈撞到 -1 命,3 命用完結束
+            <strong>勝負</strong>:全滅進下一波,蜜蜂越來越快、整體下移;被蜜蜂或炸彈撞到 −1 命,3 命用完結束
           </li>
         </ul>
       }

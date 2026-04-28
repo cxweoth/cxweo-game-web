@@ -22,7 +22,8 @@ export function playSound(kind: SoundKind): void {
   if (!ctx) return;
   switch (kind) {
     case 'shoot':
-      blip(880, 0.06, 'square', 0.08);
+      // 小聲一點 — auto-fire 模式下這個音每 0.18s 就響一次,音量大會疲勞
+      blip(880, 0.05, 'square', 0.04);
       break;
     case 'hit':
       noise(0.18, 0.18);
