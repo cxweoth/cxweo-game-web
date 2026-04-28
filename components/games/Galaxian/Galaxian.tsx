@@ -54,15 +54,13 @@ export function Galaxian() {
       instructions={
         <ul className="list-disc pl-5 space-y-1">
           <li>
-            <strong>移動</strong>:滑鼠 / 觸控位置 = 飛機目標(漸進靠近);鍵盤{' '}
-            <kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd>
+            <strong>手機 / 觸控</strong>:畫面下方左側 <kbd>←</kbd> <kbd>→</kbd> 控制移動,右側紅色 <kbd>🔫 射擊</kbd> 按住連射;也可以用手指在遊戲畫面內滑動只移動(放開停)
           </li>
           <li>
-            <strong>射擊</strong>:點按 / 觸控按住,或鍵盤 <kbd>空白鍵</kbd> /{' '}
-            <kbd>↑</kbd> / <kbd>W</kbd>(按住連射,場上最多 4 發)
+            <strong>桌機鍵盤</strong>:<kbd>←</kbd><kbd>→</kbd> 或 <kbd>A</kbd><kbd>D</kbd> 移動;<kbd>空白鍵</kbd> / <kbd>↑</kbd> / <kbd>W</kbd> 射擊(場上最多 4 發)
           </li>
           <li>
-            <strong>計分</strong>:站立蜜蜂 +10、俯衝中蜜蜂 +50、整波清空額外 +500
+            <strong>計分</strong>:站立蜜蜂 +10、俯衝中蜜蜂 +50、紅色隊長 ×2 倍分、整波清空額外 +500
           </li>
           <li>
             <strong>勝負</strong>:全滅進下一波,蜜蜂越來越快、整體下移;被蜜蜂或炸彈撞到 -1 命,3 命用完結束
@@ -70,22 +68,21 @@ export function Galaxian() {
         </ul>
       }
     >
-      <div className="relative">
-        <GalaxianCanvas
-          status={status}
-          score={score}
-          best={best}
-          lives={lives}
-          wave={wave}
-          onScore={onScore}
-          onDamage={onDamage}
-          onWaveCleared={onWaveCleared}
-          resetKey={resetKey}
-        />
+      <GalaxianCanvas
+        status={status}
+        score={score}
+        best={best}
+        lives={lives}
+        wave={wave}
+        onScore={onScore}
+        onDamage={onDamage}
+        onWaveCleared={onWaveCleared}
+        resetKey={resetKey}
+      >
         {isOver ? (
           <ResultPanel score={score} best={best} isBest={isBest} onRestart={handleRestart} />
         ) : null}
-      </div>
+      </GalaxianCanvas>
     </GameShell>
   );
 }
