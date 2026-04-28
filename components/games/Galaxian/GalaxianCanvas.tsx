@@ -82,13 +82,17 @@ export function GalaxianCanvas({
 
       const p = propsRef.current;
       const w = worldRef.current;
+      const playing = p.status === 'playing';
+      // Auto-fire:遊戲進行中飛機持續射擊,玩家專心閃避。
+      // 0.18s 冷卻 + 4 發上限會自動限制射速。鍵盤 Space / ↑ / W 仍可接受
+      // (ORed in for redundancy),但因為 auto-fire 永遠是 true,這條路徑只是 no-op。
       tickPhysics(
         w,
         dt,
-        p.status === 'playing',
+        playing,
         keysRef.current,
         pointerXRef.current,
-        shootHeldRef.current,
+        playing || shootHeldRef.current,
         p.onScore,
         p.onDamage,
         p.onWaveCleared,
@@ -147,7 +151,8 @@ export function GalaxianCanvas({
     pointerXRef.current = null;
   };
 
-  // 虛擬按鍵 — 直接操作 keysRef / shootHeldRef,等同按住鍵盤
+  // 虛擬方向鍵 — 直接操作 keysRef,等同按住鍵盤箭頭。
+  // (Auto-fire 處理射擊,所以這裡不需要 shoot handler。)
   const handleDirPress = (dir: -1 | 1) => {
     pointerXRef.current = null;
     keysRef.current.add(dir === -1 ? 'ArrowLeft' : 'ArrowRight');
@@ -155,13 +160,6 @@ export function GalaxianCanvas({
   };
   const handleDirRelease = (dir: -1 | 1) => {
     keysRef.current.delete(dir === -1 ? 'ArrowLeft' : 'ArrowRight');
-  };
-  const handleShootPress = () => {
-    shootHeldRef.current = true;
-    unlockAudio();
-  };
-  const handleShootRelease = () => {
-    shootHeldRef.current = false;
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -193,51 +191,48 @@ export function GalaxianCanvas({
   };
 
   return (
-    <div className="flex flex-col items-stretch gap-3">
-      {/* relative 限制在「畫布」這層,result panel 透過 children 注入,
-          它的 absolute inset-0 只會蓋畫布,不會蓋到下方的虛擬按鍵 */}
-      <div className="relative mx-auto w-full max-w-[480px]">
-        <div
-          ref={wrapperRef}
-          tabIndex={0}
-          role="application"
-          aria-label="小蜜蜂"
-          className={cn(
-            'no-focus-ring',
-            'block w-full touch-manipulation',
-            'overflow-hidden rounded-lg shadow-md',
-            'select-none caret-transparent',
-          )}
-          style={{
-            WebkitTapHighlightColor: 'transparent',
-            caretColor: 'transparent',
-            touchAction: 'none',
-          }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onKeyDown={handleKeyDown}
-          onKeyUp={handleKeyUp}
-        >
-          <canvas
-            ref={canvasRef}
-            width={CFG.width}
-            height={CFG.height}
-            aria-hidden
-            className="block w-full"
-            style={{ aspectRatio: `${CFG.width} / ${CFG.height}` }}
-          />
-        </div>
-        {children}
+    <div className="relative mx-auto w-full max-w-[480px]">
+      <div
+        ref={wrapperRef}
+        tabIndex={0}
+        role="application"
+        aria-label="小蜜蜂"
+        className={cn(
+          'no-focus-ring',
+          'block w-full touch-manipulation',
+          'overflow-hidden rounded-lg shadow-md',
+          'select-none caret-transparent',
+        )}
+        style={{
+          WebkitTapHighlightColor: 'transparent',
+          caretColor: 'transparent',
+          touchAction: 'none',
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
+      >
+        <canvas
+          ref={canvasRef}
+          width={CFG.width}
+          height={CFG.height}
+          aria-hidden
+          className="block w-full"
+          style={{ aspectRatio: `${CFG.width} / ${CFG.height}` }}
+        />
       </div>
+      {/* 懸浮虛擬按鍵 — absolute 在 canvas 左下 / 右下角,不會被擠出視窗 */}
       <GalaxianControls
         disabled={status !== 'playing'}
         onPressDir={handleDirPress}
         onReleaseDir={handleDirRelease}
-        onPressShoot={handleShootPress}
-        onReleaseShoot={handleShootRelease}
       />
+      {/* result panel 用 absolute inset-0 蓋住整個 .relative 容器,
+          會把按鍵也一併遮罩 — 配合 disabled,玩家專心點「再來一次」 */}
+      {children}
     </div>
   );
 }
