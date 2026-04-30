@@ -89,6 +89,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['益智', '經典'],
     implemented: true,
   },
+  {
+    slug: 'snake',
+    name: '貪食蛇',
+    description: '經典 Snake；吃蘋果加長加速，撞牆或自己即結束。',
+    emoji: '🐍',
+    tags: ['經典', '反應'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
