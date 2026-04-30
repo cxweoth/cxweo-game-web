@@ -81,6 +81,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['射擊', '經典'],
     implemented: true,
   },
+  {
+    slug: '2048',
+    name: '2048',
+    description: '滑動合併相同數字，挑戰合出 2048。簡單上手、難以放下。',
+    emoji: '🔢',
+    tags: ['益智', '經典'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
