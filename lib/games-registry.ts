@@ -97,6 +97,30 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['經典', '反應'],
     implemented: true,
   },
+  {
+    slug: 'whack-a-mole',
+    name: '打地鼠',
+    description: '30 秒內打越多地鼠越好；打到空地會扣分，反應要快。',
+    emoji: '🔨',
+    tags: ['反應', '休閒'],
+    implemented: true,
+  },
+  {
+    slug: 'memory',
+    name: '記憶翻牌',
+    description: '翻開兩張卡，圖案相同就配對成功。三難度，挑戰最短時間。',
+    emoji: '🧠',
+    tags: ['益智', '記憶'],
+    implemented: true,
+  },
+  {
+    slug: 'breakout',
+    name: '打磚塊',
+    description: '經典 Breakout；移動板子接球反彈，清光磚塊進下一關。',
+    emoji: '🧱',
+    tags: ['經典', '物理'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
