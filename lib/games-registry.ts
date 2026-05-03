@@ -145,6 +145,38 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['策略', '雙人'],
     implemented: true,
   },
+  {
+    slug: 'connect-four',
+    name: '連線四子',
+    description: '7×6 Connect 4；率先連成 4 子（橫/直/斜）即勝。雙人或對 AI（minimax）。',
+    emoji: '🔴',
+    tags: ['策略', '雙人'],
+    implemented: true,
+  },
+  {
+    slug: 'doodle-jump',
+    name: '跳躍王',
+    description: '左右移動踩平台往上跳；移動 / 易碎 / 彈簧三種變化，挑戰跳更高。',
+    emoji: '🪀',
+    tags: ['反應', '跳躍'],
+    implemented: true,
+  },
+  {
+    slug: 'sokoban',
+    name: '推箱子',
+    description: '經典 Sokoban；把所有箱子推到目標點。多關卡，可復原。',
+    emoji: '📦',
+    tags: ['益智', '推理'],
+    implemented: true,
+  },
+  {
+    slug: 'lights-out',
+    name: '關燈',
+    description: '5×5 Lights Out；點擊翻轉自己與 4 鄰，把所有燈關掉。',
+    emoji: '💡',
+    tags: ['邏輯', '益智'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {

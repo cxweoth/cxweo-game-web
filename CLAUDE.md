@@ -159,6 +159,10 @@ README.md                      本地開發 + Vercel 說明
 | 跳跳鳥 | `flappy-bird` | 2026-05-03 | Canvas + rAF（直式 480×640） | 規格外第 15 款，致敬 Flappy Bird。空白鍵 / ↑ / W / 點擊 / 觸控都當「拍翅」。物理：重力 1500、跳躍 −440、最大下墜 720（避免越掉越快視覺崩壞）。水管成對生成（中心間距 220、gap 150、寬 70），離場後從尾巴補；分數每 10 分 −8 px/s 加速，封底 −260。**狀態機 idle → playing → dying → dead**：撞到天花板/水管/地面後切 `dying`，鳥繼續落地後才轉 `dead`，期間粒子（22 顆 360° 飛散 + 重力 600）、白光 flash、抖動 0.32s 一次播完。idle 階段鳥用 `sin` 飄動 ±10px，第一次拍翅才正式進 playing(同時呼叫 onStart 同步 React state)。鳥的傾角依 vy 算 [−0.5, 1.1] rad；翅膀 `wingPhase = clamp(−vy/400, −1, 1)` 拍動。檔案拆 `types/game/render/useFlappyBird/FlappyBirdCanvas/FlappyBird` 維持 ≤ 300 行。最佳分 `setHighScore('flappy-bird')`。 |
 | 數字推盤 | `fifteen` | 2026-05-03 | DOM 絕對定位 + CSS transition | 規格外第 16 款，經典 15 Puzzle。**Tile id = 數字本身**作 React key 而不是位置 index：當磚塊在格子間移動時 React 會把同一個 DOM 留下、只改 left/top，CSS `transition-[left,top]` 150ms 帶出滑動感（用 pos 當 key 會導致兩塊 tile 互換內容、無法產生位移動畫）。Board 用長度 16 的陣列、value=0 為空格；操作支援 (a) 點擊與空格相鄰的磚塊、(b) 鍵盤 ←↑↓→ / WASD、(c) 觸控 swipe（28px 門檻）。dir 語意一致：`up` = 把空格下方磚塊往上拉。**洗牌走 240 步隨機合法移動**（避免立刻反向以免抵銷）後若剛好還是 solved 再多推一步，保證起點有挑戰性。已歸位的磚塊變綠（`bg-emerald-500`）即時回饋。計時用 `setInterval(250ms)` 推一個 setNow 觸發再 render；最佳時間用 `getBestTime/setBestTime` key=`fifteen`。 |
 | 黑白棋 | `reversi` | 2026-05-03 | SVG（無 Canvas） | 規格外第 17 款，經典 Reversi/Othello。8×8 棋盤、起手中央 4 子；落子時 8 方向 `flipsInDir` 找夾子並翻片；雙方都無步即結束、子多者勝。**PvP + 對 AI 模式**，AI 模式可選執黑/執白。AI 用線性啟發式：(1) 經典位置權重表（角 +100、X 角 −50）算「我方棋子總和」、(2) 對手機動性 `−oppMoves×4`、(3) 翻片數、(4) 角落特權 +50；終盤（空格 ≤ 12）切換成 `(我子 − 對方子) × 4 + 角獎`。多步同分隨機選一個避免每盤都一樣，避免 minimax 防止瀏覽器卡頓。AI 動作以 `setTimeout 380ms` 模擬思考延遲，玩家能看清楚翻片。useEffect 依賴 `board` 不只 `turn`：若連續輪到 AI（玩家 pass）board 變動仍會 re-trigger AI。戰績只在 AI 模式累計（W/L/D），用 `readJSON/writeJSON` 存 `reversi:stats / reversi:prefs`。提示點只在當前要落子方為人類時顯示。檔案拆 `types/logic/ai/useReversi/Reversi` 維持 ≤ 300 行。 |
+| 連線四子 | `connect-four` | 2026-05-04 | SVG 7×6（含上方 hover 預覽棋子） | 規格外第 18 款，Connect 4。**Minimax + alpha-beta 剪枝** 預設深度 5；終局使用 `WIN_SCORE − (10−depth)` 對提前獲勝/延遲輸局加減分，鼓勵 AI 早點贏、晚點輸。**搜尋順序從中央往兩側展開**（Connect 4 中央列威脅最多）以提升剪枝效率。**chooseAiColumn 入口先單步檢查必勝/必擋**：避免 minimax 在低深度看不到一步致命招（會擋你下一手就贏的那欄）。評估函數用「4 格滑動視窗」對所有方向打分（`me=3+empty=1` +100、`foe=3+empty=1` −120 略加權優先擋）+ 中央列加權。AI 動作以 `setTimeout 360ms` 模擬思考。SVG hover 在欄頂顯示半透明預覽棋子（`hoverCol`）；落子後 `lastDrop` 加一圈白邊提示、贏家連成的 4 子加 cyan ring。`prefs:{mode,playerSide,aiDepth}` 與 `stats:{W/L/D}` 用 `readJSON/writeJSON` 存。檔案拆 `types/logic/ai/useConnectFour/ConnectFour` 維持 ≤ 300 行。 |
+| 跳躍王 | `doodle-jump` | 2026-05-04 | Canvas + rAF（直式 360×640） | 規格外第 19 款，致敬 Doodle Jump。物理：重力 1400、跳 −680、彈簧 −1100。**世界 y 越上越小**、`cameraY` 只能下降不會回升（單向跟隨）；玩家爬升越高 `bestY` 越小,score = `(540 − bestY) / 4`。**自上而下落地判定**:`tryLand` 只在 `vy>0` 且「上一幀腳 ≤ 平台 y、這幀腳 ≥ 平台 y」才成立,避免跳躍時穿過上方平台;碰到平台立刻把腳對齊 y。**4 種平台**：normal(綠)/moving(藍 vx 隨機 40-90,撞牆反彈)/breakable(棕,踩中即碎並噴 10 顆粒子)/spring(黃,大彈)。**難度動態**:randomKindAtHeight 依 `climbed` 線性提升 moving / breakable 機率封頂。**側邊環繞**：玩家 px 越界 → 從另一側出現。輸入：鍵盤 ←→/AD 同時按取 sum;觸控用 pointerType 判斷,按住畫面左半 / 右半持續移動,放開即停。檔案拆 `types/game/render/useDoodleJump/DoodleJumpCanvas/DoodleJump` 維持 ≤ 300 行。最佳分 `setHighScore('doodle-jump')`。 |
+| 推箱子 | `sokoban` | 2026-05-04 | DOM grid（CSS Grid + emoji） | 規格外第 20 款,經典 Sokoban。**字串地圖格式**(同 XSokoban):`#`牆 / ` `floor / `.`goal / `$`box / `*`box-on-goal / `@`player / `+`player-on-goal,`parseLevel` 拆成 `static`(永遠不變的 wall/floor/goal cells)+ `dynamic`(player position + boxes Set)。**內建 6 關**由淺入深(一推到位 → 轉角 → 雙箱齊發 → 十字四箱 → 走廊倉庫 → 凹字陣);Set 用 "r,c" 字串 key 比對方便。**Undo 歷史**:每步 push 整個 `Dynamic` 快照進 historyRef,Ctrl+Z 彈出;為了不爆記憶體封頂 500 步。**進度與最佳步數**用 `readJSON/writeJSON` 存(`sokoban:progress` 紀錄已通關 index、`sokoban:best` 紀錄每關最少步數)。操作:鍵盤 ←↑↓→/WASD,手機 swipe(門檻 24px),`Ctrl+Z` 復原、`R` 重置本關。Cell 用 emoji 渲染避免畫圖負擔(📦/🧑/◎/▓)。 |
+| 關燈 | `lights-out` | 2026-05-04 | DOM 5×5（Tailwind ring + emoji） | 規格外第 21 款,經典 Lights Out。點任一格翻轉該格 + 上下左右 4 鄰;目標全暗。**保證可解**:從全暗開始亂點 N 次生成題目(easy=6 / normal=12 / hard=18),極端情況下亂點剛好回全暗就強制再點中央一格。**最佳步數每難度獨立記錄**用 `setBestTime` 語意(越少越好,key=`lights-out:easy/normal/hard:moves`),通關後 settledRef 鎖住避免反覆觸發 effect。亮燈用 `bg-yellow-400 + ring-4 ring-yellow-200` 配 💡 emoji,暗燈深灰配 ⚫。 |
 
 ## 6. 程式碼慣例
 
@@ -175,9 +179,12 @@ README.md                      本地開發 + Vercel 說明
 - **不使用 `any`**；必要時用 `unknown` 並在範圍內收窄。
 - **'use client'**：只有真的需要 hook / 事件處理的元件才加。遊戲主元件通常要加；
   純渲染元件留給 Server Component。
-- **本地測試 server**：當使用者要在瀏覽器測試時才啟動 `pnpm dev`（用 background
-  task），測試完成後 **務必停掉**（`TaskStop` 或 Ctrl+C）。不要長時間掛著，
-  也不要還沒被請就先啟。`pnpm build` 是 type/build 驗證、跟 dev server 是兩件事。
+- **本地測試 server（自動啟停）**：每次做完一個任務（新遊戲、修 bug、改架構）→
+  跑完 `pnpm build` 通過後，**主動以 background task 啟動 `pnpm dev`**，把可測 URL
+  列給使用者（首頁 + 本次新增/修改的遊戲頁）。當使用者表示測試完成（任何形式：
+  「commit」「好」「沒問題」「停掉」「OK」「下一個」等）→ **立刻 `TaskStop`** 把
+  dev server 停掉再 commit/合併。不要長時間掛著、不要忘記關。`pnpm build` 是
+  type/build 驗證、跟 dev server 是兩件事。
 
 ## 7. Git 工作流程
 
