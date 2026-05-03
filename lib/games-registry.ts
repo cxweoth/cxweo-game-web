@@ -177,6 +177,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['邏輯', '益智'],
     implemented: true,
   },
+  {
+    slug: 'sudoku',
+    name: '數獨',
+    description: '經典 9×9 Sudoku；4 難度自動生成保證唯一解的題目，支援筆記與計時。',
+    emoji: '🧮',
+    tags: ['益智', '邏輯'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
