@@ -77,3 +77,15 @@ dialog[open] {
 .tile-merge {
   animation: tile-merge 200ms ease-out 80ms both;
 }
+
+/* 九連環:非法切換的左右抖動;搭配紅色 stroke 給玩家明確的「不行」回饋 */
+@keyframes ring-shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-3px); }
+  40%      { transform: translateX(3px); }
+  60%      { transform: translateX(-2px); }
+  80%      { transform: translateX(2px); }
+}
+.animate-shake {
+  animation: ring-shake 220ms ease-in-out;
+}
