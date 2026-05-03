@@ -185,6 +185,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['益智', '邏輯'],
     implemented: true,
   },
+  {
+    slug: 'nine-rings',
+    name: '九連環',
+    description: '中國經典機械益智 Baguenaudier；3/5/7/9 環，9 環需要 341 步。',
+    emoji: '🪢',
+    tags: ['益智', '經典'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
