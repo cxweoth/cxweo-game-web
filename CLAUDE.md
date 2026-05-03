@@ -175,6 +175,9 @@ README.md                      本地開發 + Vercel 說明
 - **不使用 `any`**；必要時用 `unknown` 並在範圍內收窄。
 - **'use client'**：只有真的需要 hook / 事件處理的元件才加。遊戲主元件通常要加；
   純渲染元件留給 Server Component。
+- **本地測試 server**：當使用者要在瀏覽器測試時才啟動 `pnpm dev`（用 background
+  task），測試完成後 **務必停掉**（`TaskStop` 或 Ctrl+C）。不要長時間掛著，
+  也不要還沒被請就先啟。`pnpm build` 是 type/build 驗證、跟 dev server 是兩件事。
 
 ## 7. Git 工作流程
 
