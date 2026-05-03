@@ -121,6 +121,30 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['經典', '物理'],
     implemented: true,
   },
+  {
+    slug: 'flappy-bird',
+    name: '跳跳鳥',
+    description: '點擊讓鳥拍翅穿過水管；撐越久速度越快，撞到任何東西就結束。',
+    emoji: '🐤',
+    tags: ['反應', '經典'],
+    implemented: true,
+  },
+  {
+    slug: 'fifteen',
+    name: '數字推盤',
+    description: '4×4 經典 15 Puzzle；把磚塊推回 1 → 15，挑戰最少步數與最快時間。',
+    emoji: '🧩',
+    tags: ['益智', '經典'],
+    implemented: true,
+  },
+  {
+    slug: 'reversi',
+    name: '黑白棋',
+    description: '8×8 經典 Reversi/Othello；夾擊翻棋，棋多者勝。雙人或對 AI。',
+    emoji: '⚪',
+    tags: ['策略', '雙人'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
