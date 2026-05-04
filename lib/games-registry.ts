@@ -193,6 +193,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['益智', '經典'],
     implemented: true,
   },
+  {
+    slug: 'spin-out',
+    name: '邏輯神尺',
+    description: 'Spin-Out：7 顆旋鈕鎖住滑桿，全部轉橫才能釋放。與九連環同構但體驗截然不同。',
+    emoji: '🔓',
+    tags: ['益智', '經典'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
