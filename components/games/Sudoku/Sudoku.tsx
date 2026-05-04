@@ -283,8 +283,8 @@ function Grid({
     <div
       className={cn(
         'grid aspect-square w-full overflow-hidden rounded-lg',
-        'bg-zinc-900 dark:bg-zinc-700',
-        'gap-px',
+        // 外框與 3×3 分隔同寬同色，避免亮色系出現「外圈無框、內部 3×3 卻有粗框」的不一致
+        'border-2 border-zinc-500 dark:border-zinc-600',
       )}
       style={{ gridTemplateColumns: 'repeat(9, minmax(0, 1fr))' }}
     >
@@ -300,12 +300,19 @@ function Grid({
         const sameNumber = !!selectedVal && v === selectedVal;
         const isConflict = conflicts.has(i);
 
-        // 3×3 邊框加粗:每格的右/下加 1px 較深邊;每 3 格再加一 + 偏移
-        // 為了簡潔,用內部 border 控制
+        // 用 cell 自身的右 / 下 border 畫格線：
+        //   - 3×3 邊界:2px、深一階(zinc-500)→ 與外框同寬同色,層級分明
+        //   - 一般格:1px、淡一階(zinc-300 / dark:zinc-700)→ 在亮色系不會搶眼
+        // 比 gap-px + mr-px 的舊作法更可預測,亮色系的對比也更柔和。
         const borderClass = cn(
-          // 右側每 3 格加深邊
-          c % 3 === 2 && c !== 8 ? 'mr-px' : '',
-          r % 3 === 2 && r !== 8 ? 'mb-px' : '',
+          c !== 8 &&
+            (c % 3 === 2
+              ? 'border-r-2 border-r-zinc-500 dark:border-r-zinc-600'
+              : 'border-r border-r-zinc-300 dark:border-r-zinc-700'),
+          r !== 8 &&
+            (r % 3 === 2
+              ? 'border-b-2 border-b-zinc-500 dark:border-b-zinc-600'
+              : 'border-b border-b-zinc-300 dark:border-b-zinc-700'),
         );
 
         return (
