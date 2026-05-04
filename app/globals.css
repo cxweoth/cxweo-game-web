@@ -89,3 +89,21 @@ dialog[open] {
 .animate-shake {
   animation: ring-shake 220ms ease-in-out;
 }
+
+/* 邏輯神尺:可拉時把手脈動,提示玩家「這顆能拉」 */
+@keyframes spinout-pulse {
+  0%, 100% {
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.65),
+      inset 0 -3px 5px rgba(0, 0, 0, 0.35),
+      inset 0 2px 4px rgba(255, 255, 255, 0.5),
+      0 0 0 0 rgba(248, 113, 113, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.65),
+      inset 0 -3px 5px rgba(0, 0, 0, 0.35),
+      inset 0 2px 4px rgba(255, 255, 255, 0.5),
+      0 0 0 8px rgba(248, 113, 113, 0);
+  }
+}
