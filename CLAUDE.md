@@ -138,6 +138,22 @@ README.md                      本地開發 + Vercel 說明
 [ ] 等使用者確認後合併回 main
 ```
 
+### 物理 / 機械類益智遊戲(Spin-Out / Nine Rings 之類)的額外注意事項
+
+當「玩家可操作的 UI 範圍(滑桿能拉到哪、按鈕能按到哪)」與「puzzle 規則
+(canRotate / 合法狀態轉移)」是兩套獨立系統時:
+
+1. **先用最小規模 trace 驗證可解性,再動 UI**。把 n=2 或 n=3 的最優解
+   一步一步寫出來,標出每步當下的 UI 狀態(滑桿位置、能按哪顆),確認
+   每一步在你的 UI 模型下都做得到。Spin-Out 第一版「單一固定槽 + 滑桿
+   被卡住 + 原始 maxX 公式」trace 到第二步就卡死(旋鈕 K 永遠到不了
+   單一槽),這時要回頭調公式,而不是硬幹 UI。
+2. **三項衝突時直接告訴使用者**。「單一槽 / 滑桿可被卡 / 原始 puzzle 規則」
+   這類三選二的數學限制要明講,讓使用者選要犧牲哪一項。Spin-Out 後來加
+   1 格 free play 把「單一槽」往左挪一格達成相容,就是其中一種解法。
+3. **解釋滑桿位置給使用者時用「格 / unit」,不要直接給 px 數字**。
+   px 數字(72、144...)使用者看不出意義,「拉 0 格 / 拉 1 格」直觀很多。
+
 ## 5. 已完成遊戲清單
 
 | 名稱 | slug | 完成日期 | 渲染方式 | 備註 |
@@ -164,7 +180,7 @@ README.md                      本地開發 + Vercel 說明
 | 推箱子 | `sokoban` | 2026-05-04 | DOM grid（CSS Grid + emoji） | 規格外第 20 款,經典 Sokoban。**字串地圖格式**(同 XSokoban):`#`牆 / ` `floor / `.`goal / `$`box / `*`box-on-goal / `@`player / `+`player-on-goal,`parseLevel` 拆成 `static`(永遠不變的 wall/floor/goal cells)+ `dynamic`(player position + boxes Set)。**內建 6 關**由淺入深(一推到位 → 轉角 → 雙箱齊發 → 十字四箱 → 走廊倉庫 → 凹字陣);Set 用 "r,c" 字串 key 比對方便。**Undo 歷史**:每步 push 整個 `Dynamic` 快照進 historyRef,Ctrl+Z 彈出;為了不爆記憶體封頂 500 步。**進度與最佳步數**用 `readJSON/writeJSON` 存(`sokoban:progress` 紀錄已通關 index、`sokoban:best` 紀錄每關最少步數)。操作:鍵盤 ←↑↓→/WASD,手機 swipe(門檻 24px),`Ctrl+Z` 復原、`R` 重置本關。Cell 用 emoji 渲染避免畫圖負擔(📦/🧑/◎/▓)。 |
 | 關燈 | `lights-out` | 2026-05-04 | DOM 5×5（Tailwind ring + emoji） | 規格外第 21 款,經典 Lights Out。點任一格翻轉該格 + 上下左右 4 鄰;目標全暗。**保證可解**:從全暗開始亂點 N 次生成題目(easy=6 / normal=12 / hard=18),極端情況下亂點剛好回全暗就強制再點中央一格。**最佳步數每難度獨立記錄**用 `setBestTime` 語意(越少越好,key=`lights-out:easy/normal/hard:moves`),通關後 settledRef 鎖住避免反覆觸發 effect。亮燈用 `bg-yellow-400 + ring-4 ring-yellow-200` 配 💡 emoji,暗燈深灰配 ⚫。 |
 | 數獨 | `sudoku` | 2026-05-04 | DOM 9×9 grid（CSS gap 模擬粗線） | 規格外第 22 款,經典 9×9 Sudoku。**4 難度即時生成保證唯一解**:easy=40 / medium=32 / hard=27 / expert=24 線索。生成流程:(1) `canonicalSolved` 用數學公式 `(((r%3)*3 + r/3) + c) % 9 + 1` 建出基底滿盤(O(81),不需要 backtracking)、(2) 帶內換列 / 帶間換、堆內換欄 / 堆間換、隨機 1..9 重新標籤打散得到隨機合法解、(3) `carvePuzzle` 隨機順序逐對 180° 對稱挖洞,每挖一對用 solveCount(limit=2) 驗證仍唯一解,不唯一就還原。**solver 用 row/col/box 三組 Int32Array bitmask + MRV(候選最少格優先)** 大幅加速,生成困難題目仍 ≤ 200ms。**功能**:選格(點擊或方向鍵)、填數字(1–9 / 鍵盤)、清除(Del/Backspace/0)、筆記模式(N 鍵切換,bit mask 存於 notes[81])、Ctrl+Z 復原、即時衝突高亮(同列/欄/宮重複數字標紅)、同列 / 同欄 / 同宮 / 同數字三層 highlight。**生成中** UI 鎖住按鈕並顯「生成中…」,實際用 `setTimeout(0)` 把 carve 丟到下個 tick 讓畫面先更新。檔案拆 `types/solver/generator/useSudoku/Sudoku` 維持 ≤ 300 行。每難度最佳時間用 `setBestTime` 存(`sudoku:<diff>`)。 |
-| 邏輯神尺 | `spin-out` | 2026-05-04 | DOM + CSS transform（黑塑膠框 + 木刻度尺 + 七彩旋鈕 + 紅球把手） | 規格外第 24 款,Binary Arts 經典 Spin-Out。**數學上與九連環同構**(都對應 Gray code,V≡ON、H≡OFF)但視覺與機械語言截然不同。**單一金色旋轉槽機制**:框體只在 slot N−1(旋鈕 1 起始位置)有金色凹槽 + 上方 ▼ ROTATE 箭頭,**任何旋鈕都必須先被滑到金色槽中**才能轉(再加 puzzle 規則 `canRotate`)。旋鈕 K 對齊金色槽 ⇔ 滑桿位移 `T = K−1` 格(K=1 在 T=0、K=2 在 T=1、K=K 在 T=K−1)。**滑桿可被卡住**:`maxX = (consecutiveH + 1) × unit`(consecutiveH 從右算起連續 H 數),保留 1 格 free play 對應「旋鈕 1 永遠可轉」— 全 V 時滑桿仍可右推 1 格把 1 換出來、讓 2 進槽。**框體右側開口**:`rounded-l-2xl` 只收左側兩個圓角、`boxShadow` 不投右邊、slot recess 延伸到框右邊緣、只放左上左下 2 顆螺絲,看起來像「黃尺出口」。框體寬度 = `woodWidth + 88 + unit`(額外 1 格給旋鈕 1 右推進去),依 N=3/5/7 變化。**3/5/7 鈕**(7 鈕標準解 85 步、5 鈕 21、3 鈕 5)。**雙模式**:`release` / `lock`,最佳步數 key=`spin-out:<n>:<goal>`。**互動**:pointer events 拖把手控制 `dragX`,放開後 snap 到最近 unit;拖曳期間旋鈕鎖死,旋鈕沒對齊金色槽 / puzzle 規則拒絕都不能轉。**七彩旋鈕**:`DIAL_COLORS` 7 色彩虹色階(rose/orange/amber/green/cyan/blue/violet),每顆有彩色塑膠盤 + 同色拍片(8×30 rectangular tab,V/H 透過 rotate 0deg/90deg 切換)+ 中央銀色鉚釘。**底下觸控按鈕**:容器寬度與黃尺一致、左 margin 對齊黃尺左緣,每顆放在 72px 格子裡,正好對到上方旋鈕。`logic.ts` 與 NineRings 解耦(獨立 `stateToStepsFromAllHoriz` / `hintTowardAll{Horiz,Vertical}`)。**SpinOut.tsx 目前 773 行**,超過 CLAUDE.md 的 300 行限制(後續可拆 `Frame` / `Slider` / `Dial` / `Wells` / `TouchPad` 子元件)。 |
+| 邏輯神尺 | `spin-out` | 2026-05-05 | DOM + CSS transform（黑塑膠框 + 木刻度尺 + 七彩旋鈕 + 紅球把手） | 規格外第 24 款,Binary Arts 經典 Spin-Out。**數學上與九連環同構**(都對應 Gray code,V≡ON、H≡OFF)但視覺與機械語言截然不同。**單一金色旋轉槽機制**:框體只在 slot N−1(旋鈕 1 起始位置)有金色凹槽 + 上方 ▼ ROTATE 箭頭,**任何旋鈕都必須先被滑到金色槽中**才能轉(再加 puzzle 規則 `canRotate`)。旋鈕 K 對齊金色槽 ⇔ 滑桿位移 `T = K−1` 格(K=1 在 T=0、K=2 在 T=1、K=K 在 T=K−1)。**滑桿可被卡住**:`maxX = (consecutiveH + 1) × unit`(consecutiveH 從右算起連續 H 數)。**為何 +1 free play 不是裝飾而是數學必需**:若 `maxX = consecutiveH × unit`(原始 Spin-Out 模型),旋鈕 K(K≥2)依規則可轉時 maxX = (K−2)·unit,但要對齊單一固定槽需 T = (K−1)·unit > maxX → 永遠到不了槽 → 不可解。加 1 格 free play 後 maxX = (K−1)·unit 剛好觸及槽,且這 1 格對應「旋鈕 1 永遠可轉」(全 V 時也可把 1 推出讓 2 進槽);n=3 仍 5 步、n=7 仍 85 步,最優解未被破壞。**框體右側開口**:`rounded-l-2xl` 只收左側兩個圓角、`boxShadow` 不投右邊、slot recess 延伸到框右邊緣、只放左上左下 2 顆螺絲,看起來像「黃尺出口」。框體寬度 = `woodWidth + 88 + unit`(額外 1 格給旋鈕 1 右推進去),依 N=3/5/7 變化。**3/5/7 鈕**(7 鈕標準解 85 步、5 鈕 21、3 鈕 5)。**雙模式**:`release` / `lock`,最佳步數 key=`spin-out:<n>:<goal>`。**互動**:pointer events 拖把手控制 `dragX`,放開後 snap 到最近 unit;拖曳期間旋鈕鎖死,旋鈕沒對齊金色槽 / puzzle 規則拒絕都不能轉。**七彩旋鈕**:`DIAL_COLORS` 7 色彩虹色階(rose/orange/amber/green/cyan/blue/violet),每顆有彩色塑膠盤 + 同色拍片(8×30 rectangular tab,V/H 透過 rotate 0deg/90deg 切換)+ 中央銀色鉚釘。**底下觸控按鈕**:容器寬度與黃尺一致、左 margin 對齊黃尺左緣,每顆放在 72px 格子裡,正好對到上方旋鈕。`logic.ts` 與 NineRings 解耦(獨立 `stateToStepsFromAllHoriz` / `hintTowardAll{Horiz,Vertical}`)。**⚠ 技術債:SpinOut.tsx 目前 773 行**,超過 CLAUDE.md 的 300 行限制 — 下次動到這個遊戲時請先拆 `Frame` / `Slider` / `DialKnob` / `Wells` / `TouchPad` 子元件。 |
 | 九連環 | `nine-rings` | 2026-05-05 | DOM + SVG（每環一個 SVG button） | 規格外第 23 款,中國經典 Baguenaudier。**核心規則遞迴**:環 1 永遠可動;環 k(k≥2) 可切換 ⇔ 環 k−1 ON 且環 1..k−2 全 OFF。**Gray code 等價**:每個合法狀態 ↔ 唯一整數 N ∈ [0, 2^n−1],一次合法操作 = N±1。`stateToStepsFromAllOff` 把 state 視作 Gray code 後做 inverse-Gray (`n ^= n>>1; n ^= n>>2; ...`) 還原 N → 即為「離全 OFF 還剩 N 步」;**雙向 hint** `hintTowardAllOff/AllOn` 共用 `diffRing(curN, targetN)`,比較 `g(curN) ⊕ g(targetN)` 找出該動的環(必恰一個 bit 不同)。`allOnStepsFromAllOff(n)` 用 inverse-Gray 算出全 ON 對應的 N(9 環為 341),所以雙向最少步數對稱一致。**雙模式**:`take-off`(全 ON → 全 OFF)/ `put-back`(全 OFF → 全 ON);最佳步數 key=`nine-rings:<n>:<goal>` 各自記錄。最佳走法步數公式:奇數環 `(2^(n+1)−1)/3`、偶數環 `(2^(n+1)−2)/3` — 9 環 341 步。**4 種規模 × 2 模式 = 8 個獨立紀錄**。**鐵環視覺**:木紋背景(repeating-linear-gradient 斜紋)+ 圓柱鐵桿(5 段亮暗漸層 + inset highlight/shadow + 球狀釘頭) + 三層 SVG 鐵環(黑色描邊 ⇢ 主環金屬漸層 ⇢ 內側 radial 陰影做孔深度) + 上弧白色高光 + 下弧黑色暗影 + 中央銅牌寫編號;ON / OFF 兩套金屬色(亮鐵 vs 暗沉鐵)。**雙層 transform**:外層 div 處理「環掉下/抬起」的 translateY,內層 svg 處理 shake 的 translateX,避免抖動時 OFF 環瞬間跳回 ON 位置。提示開時下一步該動的環頂端冒出 ✨;非法點擊觸發 220ms `ring-shake` 抖動 + 紅 stroke 漸層。檔案拆 `types/logic/useNineRings/NineRings` 維持 ≤ 300 行。 |
 
 ## 6. 程式碼慣例
