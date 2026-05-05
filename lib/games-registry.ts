@@ -209,6 +209,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['策略', '雙人'],
     implemented: true,
   },
+  {
+    slug: 'sword-duel',
+    name: '劍盾決鬥',
+    description: '騎士 vs 盾劍哥布林的近身戰鬥；繞到怪物背後砍可致命暴擊，正面打盾會被擋。',
+    emoji: '⚔️',
+    tags: ['動作', '戰鬥'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
