@@ -201,6 +201,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['益智', '經典'],
     implemented: true,
   },
+  {
+    slug: 'hex',
+    name: '六貫棋',
+    description: '經典 Hex 連通棋；黑連上下、白連左右，先連通者勝。N=7/9/11，可選 Pie 規則平衡先手。',
+    emoji: '⬡',
+    tags: ['策略', '雙人'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
