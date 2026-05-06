@@ -217,6 +217,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['動作', '戰鬥'],
     implemented: true,
   },
+  {
+    slug: 'geo-dash',
+    name: '節奏方塊',
+    description: '致敬 Geometry Dash Stereo Madness；點擊跳過尖刺，即時合成 EDM 配樂。手工關 + 無盡模式。',
+    emoji: '🟦',
+    tags: ['節奏', '反應'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
