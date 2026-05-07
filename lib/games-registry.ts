@@ -225,6 +225,14 @@ export const GAMES: readonly GameMeta[] = [
     tags: ['節奏', '反應'],
     implemented: true,
   },
+  {
+    slug: 'maze-eater',
+    name: '迷宮吃豆',
+    description: '致敬 Pac-Man；吃光豆子過關，大力丸讓鬼變藍可吃。19×21 迷宮 + 4 隻鬼魂個性 AI。',
+    emoji: '🟡',
+    tags: ['經典', '迷宮'],
+    implemented: true,
+  },
 ];
 
 export function getGameBySlug(slug: string): GameMeta | undefined {
